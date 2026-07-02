@@ -88,7 +88,7 @@ class UpdateTicketTierData extends Data
             ],
             'sales_channels.*' => [
                 'string',
-                In::create(self::ALLOWED_CHANNELS),
+                In::create(...self::ALLOWED_CHANNELS),
             ],
         ];
     }
