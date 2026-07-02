@@ -1,0 +1,707 @@
+{
+	"info": {
+		"_postman_id": "ticket-tier-api-2026",
+		"name": "Ticket Tier Management API",
+		"description": "Complete API collection for managing ticket tiers for events. Includes authentication, CRUD operations, filtering, and publishing workflows.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "ticket-tier-api"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('auth_token', response.token);",
+									"    pm.environment.set('auth_token', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Authenticate user and receive bearer token. Default credentials: test@example.com / password"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ticket Tiers",
+			"item": [
+				{
+					"name": "List All Ticket Tiers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Get all ticket tiers with default sorting (latest first). Returns paginated results."
+					},
+					"response": []
+				},
+				{
+					"name": "List Ticket Tiers - Filtered by Event",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers?filter[event_id]=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							],
+							"query": [
+								{
+									"key": "filter[event_id]",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Filter ticket tiers by specific event ID"
+					},
+					"response": []
+				},
+				{
+					"name": "List Ticket Tiers - Filtered by Channel",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers?filter[channel]=web",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							],
+							"query": [
+								{
+									"key": "filter[channel]",
+									"value": "web",
+									"description": "Available channels: web, box_office, mobile, partner"
+								}
+							]
+						},
+						"description": "Filter tiers available on a specific sales channel. Returns tiers with NULL sales_channels (available on all) and tiers with matching channel."
+					},
+					"response": []
+				},
+				{
+					"name": "List Ticket Tiers - Sorted by Price",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers?sort=-price",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-price",
+									"description": "Use '-' prefix for descending. Available: name, price, created_at"
+								}
+							]
+						},
+						"description": "Sort ticket tiers by price (descending). Use 'price' without '-' for ascending."
+					},
+					"response": []
+				},
+				{
+					"name": "List Ticket Tiers - With Event Relationship",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers?include=event",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "event"
+								}
+							]
+						},
+						"description": "Include related event data in the response"
+					},
+					"response": []
+				},
+				{
+					"name": "List Ticket Tiers - Combined Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers?filter[event_id]=1&filter[channel]=web&sort=-price&include=event&per_page=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							],
+							"query": [
+								{
+									"key": "filter[event_id]",
+									"value": "1"
+								},
+								{
+									"key": "filter[channel]",
+									"value": "web"
+								},
+								{
+									"key": "sort",
+									"value": "-price"
+								},
+								{
+									"key": "include",
+									"value": "event"
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Example combining multiple query parameters: filter by event and channel, sort by price, include event, custom page size"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Ticket Tier",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers",
+								"1"
+							]
+						},
+						"description": "Get details of a specific ticket tier by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ticket Tier - Full Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('tier_id', response.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1,\n    \"name\": \"Early Bird\",\n    \"price\": 50.00,\n    \"quantity\": 100,\n    \"sales_channels\": [\"web\", \"mobile\"],\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Create a new ticket tier with all optional fields specified. Sales channels restrict where the tier can be sold."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ticket Tier - All Channels",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1,\n    \"name\": \"General Admission\",\n    \"price\": 30.00,\n    \"quantity\": 500\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Create a ticket tier available on all sales channels (omit sales_channels field or set to null)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ticket Tier - VIP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 2,\n    \"name\": \"VIP\",\n    \"price\": 200.00,\n    \"quantity\": 50,\n    \"sales_channels\": [\"box_office\", \"partner\"],\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Create a VIP tier for event 2, available only through box office and partner channels"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ticket Tier - Partial",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 40.00,\n    \"quantity\": 150\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers/{{tier_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers",
+								"{{tier_id}}"
+							]
+						},
+						"description": "Update specific fields of a ticket tier. Only provided fields will be updated (partial update using Optional wrapper)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ticket Tier - Full",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Super Early Bird\",\n    \"price\": 45.00,\n    \"quantity\": 120,\n    \"sales_channels\": [\"web\", \"mobile\", \"box_office\"],\n    \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers",
+								"1"
+							]
+						},
+						"description": "Update multiple fields of a ticket tier at once"
+					},
+					"response": []
+				},
+				{
+					"name": "Publish Ticket Tier",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers/{{tier_id}}/publish",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers",
+								"{{tier_id}}",
+								"publish"
+							]
+						},
+						"description": "Publish a ticket tier to make it available for sale. Sets is_published to true."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Ticket Tier",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers/{{tier_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers",
+								"{{tier_id}}"
+							]
+						},
+						"description": "Soft-delete a ticket tier. The tier will be excluded from index queries but remains in database with deleted_at timestamp."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Validation Examples",
+			"item": [
+				{
+					"name": "Validation Error - Missing Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Example showing validation errors when required fields are missing (name, price, quantity)"
+					},
+					"response": []
+				},
+				{
+					"name": "Validation Error - Invalid Channel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1,\n    \"name\": \"Test Tier\",\n    \"price\": 50.00,\n    \"quantity\": 100,\n    \"sales_channels\": [\"invalid_channel\", \"web\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Example showing validation error for invalid sales channel. Valid channels: web, box_office, mobile, partner"
+					},
+					"response": []
+				},
+				{
+					"name": "Validation Error - Duplicate Name (Same Event)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1,\n    \"name\": \"Early Bird\",\n    \"price\": 50.00,\n    \"quantity\": 100\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Example showing uniqueness validation. Tier names must be unique per event (same name allowed across different events)."
+					},
+					"response": []
+				},
+				{
+					"name": "Validation Error - Negative Price",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1,\n    \"name\": \"Free Tier\",\n    \"price\": -10,\n    \"quantity\": 100\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Example showing validation error for negative price. Price must be >= 0."
+					},
+					"response": []
+				},
+				{
+					"name": "Validation Error - Zero Quantity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event_id\": 1,\n    \"name\": \"Test Tier\",\n    \"price\": 50.00,\n    \"quantity\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/ticket-tiers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"ticket-tiers"
+							]
+						},
+						"description": "Example showing validation error for zero quantity. Quantity must be >= 1."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "tier_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
